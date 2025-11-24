@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "composite": true,
+
+    "rootDir": "${configDir}/src",
+    "outDir": "${configDir}/dist",
+
+    "module": "preserve",
+    "target": "es2020",
+
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+
+    "exactOptionalPropertyTypes": true,
+    "strict": true,
+
+    "jsx": "react-jsx",
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "noUncheckedSideEffectImports": true,
+    "moduleDetection": "force",
+    "skipLibCheck": true,
+
+  },
+  "include": [
+    "${configDir}/src"
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "name": "funcfunc",
+  "version": "0.0.1",
+  "description": "functional programing framework",
+  "type": "module",
+  "main": "./dist/main.js",
+  "exports": {
+    ".": {
+      "default": "./dist/main.js",
+      "import": "./dist/main.js",
+      "types": "./dist/main.d.ts"
+    },
+    "./*": {
+      "default": "./dist/lib/*.js",
+      "import": "./dist/lib/*.js",
+      "types": "./dist/lib/*.js"
+    }
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "test": "vitest --typecheck",
+    "clean": "rm -rf dist"
+  },
+  "author": "Kuwabiraki Yûki",
+  "license": "MIT",
+  "devDependencies": {
+    "@eslint/js": "^9.38.0",
+    "@rollup/plugin-multi-entry": "^7.1.0",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^12.3.0",
+    "eslint": "^9.38.0",
+    "globals": "^16.4.0",
+    "jiti": "^2.6.1",
+    "rollup": "^4.52.5",
+    "tslib": "^2.8.1",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.2",
+    "vitest": "^4.0.6"
+  },
+  "types": "./dist/main.d.ts"
+}

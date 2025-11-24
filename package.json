@@ -1,0 +1,8 @@
+{
+  "name": "@funcfunc/parent",
+  "private": true,
+  "workspaces": [
+    "packages/funcfunc-core",
+    "packages/funcfunc-react"
+  ]
+}
