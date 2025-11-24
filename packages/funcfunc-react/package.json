@@ -2,8 +2,10 @@
   "name": "@funcfunc/react",
   "version": "0.0.1",
   "description": "functional programing framework for React",
+  "author": "Kuwabiraki Yûki",
+  "license": "MIT",
   "type": "module",
-  "main": "main.js",
+  "main": "./dist/main.js",
   "exports": {
     ".": {
       "default": "./dist/main.js",
@@ -21,8 +23,6 @@
     "test": "vitest --typecheck",
     "clean": "rm -rf dist"
   },
-  "author": "Kuwabiraki Yûki",
-  "license": "MIT",
   "peerDependencies": {
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
