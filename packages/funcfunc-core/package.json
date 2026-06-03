@@ -9,33 +9,25 @@
   "exports": {
     ".": {
       "default": "./dist/main.js",
-      "import": "./dist/main.js",
-      "types": "./dist/main.d.ts"
+      "import": "./dist/main.js"
     },
     "./*": {
       "default": "./dist/lib/*.js",
-      "import": "./dist/lib/*.js",
-      "types": "./dist/lib/*.js"
+      "import": "./dist/lib/*.js"
     }
   },
   "scripts": {
     "build": "rollup -c",
-    "test": "vitest --typecheck",
+    "test": "vitest",
     "clean": "rm -rf dist"
   },
   "devDependencies": {
-    "@eslint/js": "^9.38.0",
+    "@eslint/js": "^10.0.1",
     "@rollup/plugin-multi-entry": "^7.1.0",
-    "@rollup/plugin-terser": "^0.4.4",
-    "@rollup/plugin-typescript": "^12.3.0",
-    "eslint": "^9.38.0",
-    "globals": "^16.4.0",
-    "jiti": "^2.6.1",
-    "rollup": "^4.52.5",
-    "tslib": "^2.8.1",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.46.2",
-    "vitest": "^4.0.6"
-  },
-  "types": "./dist/main.d.ts"
+    "@rollup/plugin-terser": "^1.0.0",
+    "eslint": "^10.4.0",
+    "globals": "^17.6.0",
+    "rollup": "^4.60.4",
+    "vitest": "^4.1.7"
+  }
 }

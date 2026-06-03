@@ -23,11 +23,11 @@ export type Path<T> = SubTuple<FullPath<T>>;
 type FullPath<T> =
   T extends readonly unknown[] ? { [i in keyof T]: [StrToNum<i>, ...FullPath<T[i]>] }[keyof T]
   : T extends object ? { [k in keyof T]: [k, ...FullPath<T[k]>] }[keyof T]
-  : [];
+  : readonly [];
 
 type SubTuple<TS extends readonly unknown[]> =
   TS extends readonly [...infer TSS, unknown] ? SubTuple<TSS> | TS
-  : [];
+  : readonly [];
 
 export type StrToNum<T> = T extends `${infer I extends number}` ? I : never;
 
