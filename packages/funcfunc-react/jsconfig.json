@@ -2,9 +2,4 @@
   "extends": [
     "../../jsconfig.base.json"
   ],
-  "references": [
-    {
-      "path": "../funcfunc-core"
-    }
-  ]
 }

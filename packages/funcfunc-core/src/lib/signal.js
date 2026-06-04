@@ -226,13 +226,13 @@ export class Focus extends _InterNode {
     this._meta = { _state: "disabled" };
   }
 
-  _deref(node, eff) {
+  _deref() {
     return this._update();
   }
 
   _swap(swapper) {
     const { _lens } = this;
-    const [next, changed] = this._depNode._swap((dep) => upd(_lens, dep, swapper(view(_lens, dep))));
+    const [, changed] = this._depNode._swap((dep) => upd(_lens, dep, swapper(view(_lens, dep))));
 
     return [this._update(), changed];
   }
@@ -304,9 +304,8 @@ export class Effect {
         const changed = !_meta._depValues.every((prev, i) => is(prev, depValues[i]));
         if (changed) {
           _meta._depValues = depValues;
+          this._handler(...depValues);
         }
-
-        this._handler(...depValues);
         break;
       }
       default: {

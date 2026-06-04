@@ -1,10 +1,9 @@
 import terser from '@rollup/plugin-terser';
-import typescript from '@rollup/plugin-typescript';
 import { defineConfig } from 'rollup';
 
 export default defineConfig([
   {
-    input: "src/main.ts",
+    input: "src/main.js",
     output: [
       {
         dir: "dist",
@@ -27,7 +26,5 @@ export default defineConfig([
         plugins: [terser({ mangle: { properties: { regex: /^_.*/ } } })]
       },
     ],
-    logLevel: "debug",
-    plugins: [typescript({ exclude: ["**/*.test.ts"] })]
   },
 ]);
