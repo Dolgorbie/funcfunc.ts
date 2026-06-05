@@ -1,11 +1,11 @@
 import { pathLens } from "funcfunc/lens";
 import { atom, effect, focus, release, retain, track } from "funcfunc/signal";
+import { useState } from "react";
 import { useMemo, useSyncExternalStore } from "react";
 
 export function useAtom(init) {
-  return useMemo(() => {
-    return atom(typeof init === "function" ? init() : init);
-  }, [init]);
+  const [atm] = useState(() => atom(typeof init === "function" ? init() : init));
+  return atm;
 }
 
 export function useValue(atm) {
