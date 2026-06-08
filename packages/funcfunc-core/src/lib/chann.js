@@ -1,3 +1,5 @@
+import { pa1 } from "./core";
+
 const _resolve = Promise.resolve;
 
 export function chann() {
@@ -25,7 +27,10 @@ export function isClosed(chann) {
 }
 
 export async function alt(...channs) {
-  for (const c of channs) {
+  const { length } = channs;
+  const offset = Math.random() * length | 0
+  for (let i = 0; i < length; ++i) {
+    const c = channs[(i + offset) % length];
     if (c._senders.size > 0) {
       const send = c._senders.values().next().value;
       c._senders.delete(send);
@@ -49,6 +54,24 @@ export async function alt(...channs) {
       c._receivers.delete(recv);
     }
   }
+}
+
+export function connectWorker(worker) {
+  const input = chann();
+  const output = chann();
+  const error = chann();
+
+  worker.addEventListener("message", pa1(push, output));
+  worker.addEventListener("error", pa1(push, error));
+  worker.addEventListener("messageerror", pa1(push, error));
+  (async () => {
+    for (; ;) {
+      const value = await pop(input);
+      worker.postMessage(value);
+    }
+  })();
+
+  return { input, output, error };
 }
 
 export class Chann {
@@ -99,6 +122,19 @@ export class Chann {
     this._receivers.clear();
     this._push = _throwClosedError;
     this._pop = _throwClosedError;
+  }
+
+  static fromPromise(promise) {
+    const c = chann();
+    (async () => {
+      try {
+        const value = await promise;
+        push(c, value);
+      } finally {
+        close(c);
+      }
+    })();
+    return c;
   }
 }
 

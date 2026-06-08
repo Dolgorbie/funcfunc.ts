@@ -1,8 +1,10 @@
-export function multi({ dispatch, defaultImpl }) {
+import { is } from "./asfunc";
+
+export function multi({ dispatch, isa = _isa, defaultImpl = _defaultImpl }) {
   const implMap = new Map();
 
   function _doMethod(...args) {
-    const keys = dispatch(...args);
+    const keys = isa(dispatch(...args));
     for (const k of keys) {
       const impl = implMap.get(k);
       if (impl != null) {
@@ -20,4 +22,26 @@ export function multi({ dispatch, defaultImpl }) {
   return _doMethod;
 }
 
-function _() { }
+export function derive(parent, child) {
+  let uppers = _hierarchy.get(child);
+  if (uppers == null) {
+    _hierarchy.set(child, uppers = [child]);
+  }
+
+  if (uppers.every((u) => !is(u, parent))) {
+    uppers.push(parent);
+  }
+}
+
+const _hierarchy = new Map();
+
+function _isa(key) {
+  const uppers = _hierarchy.get(key);
+  return uppers ? uppers : [key];
+}
+
+export { _isa as isa };
+
+function _defaultImpl() {
+  throw TypeError("Not implemented");
+}
