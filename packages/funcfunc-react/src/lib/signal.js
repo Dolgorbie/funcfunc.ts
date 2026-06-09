@@ -1,7 +1,6 @@
 import { pathLens } from "funcfunc/lens";
 import { atom, effect, focus, release, retain, track } from "funcfunc/signal";
-import { useState } from "react";
-import { useMemo, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
 export function useAtom(init) {
   const [atm] = useState(() => atom(typeof init === "function" ? init() : init));
@@ -20,7 +19,7 @@ function createHandle(atm) {
       _listener();
     }
   }
-  
+
   let _listener = void 0;
   let _value = void 0;
 
@@ -42,15 +41,36 @@ function createHandle(atm) {
 }
 
 export function useTrack(handler, ...nodes) {
-  return useMemo(()=> track(handler, ...nodes), [handler, ...nodes]);
+  const node = useMemo(() => track(handler, ...nodes), [handler, ...nodes]);
+  useEffect(() => {
+    retain(node);
+    return () => {
+      release(node);
+    };
+  }, [node]);
+  return node;
 }
 
 export function useFocus(lns, node) {
-  return useMemo(()=> focus(lns, node), [lns, node]);
+  const fc = useMemo(() => focus(lns, node), [lns, node]);
+  useEffect(() => {
+    retain(fc);
+    return () => {
+      release(fc);
+    };
+  }, [fc]);
+  return fc;
 }
 
 export function usePathFocus(node, ...path) {
-  return useMemo(()=> focus(pathLens(...path), node), [node, ...path]);
+  const fc = useMemo(() => focus(pathLens(...path), node), [node, ...path]);
+  useEffect(() => {
+    retain(fc);
+    return () => {
+      release(fc);
+    };
+  }, [fc]);
+  return fc;
 }
 
 export function useValueAtom(init) {

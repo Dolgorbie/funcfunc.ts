@@ -3,7 +3,10 @@ export const isArray = Array.isArray;
 export const is = Object.is;
 export const objectFromEntries = Object.fromEntries;
 export const objectEntries = Object.entries;
+export const objectKeys = Object.keys;
+export const objectValues = Object.values;
 export const objectHasOwn = Object.hasOwn;
+export const objectPrototypeOf = Object.getPrototypeOf;
 
 export function isNull(x) {
   return x === null;
