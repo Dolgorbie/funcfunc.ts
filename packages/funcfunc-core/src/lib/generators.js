@@ -1,77 +1,90 @@
+
 export function* map(proc, iter0, ...iters) {
-  switch (iters.length) {
-    case 0: {
-      yield* map1(proc, iter0);
-      break;
-    }
-    default: {
-      const it0 = iter0[Symbol.iterator]();
-      const its = _getIterators(iters);
-      const values = new Array(its.length + 1);
-      try {
-        while (!_nextIters(values, it0, its)) {
-          yield proc(...values);
-        }
-      } finally {
-        _safeReturn(it0);
-        const length = its.length;
-        for (let i = 0; i < length; ++i) {
-          _safeReturn(its[i]);
-        }
-      }
-    }
+  if (iters.length === 0) {
+    yield* map1(proc, iter0);
+  } else {
+    yield* _mapN(proc, iter0, iters);
   }
 }
+
 
 export function* map1(proc, iter0) {
-  const it0 = iter0[Symbol.iterator]();
-  let value, done;
+  for (const v0 of iter0) {
+    yield proc(v0);
+  }
+}
+
+function* _mapN(proc, iter0, iters) {
+  const niters = iters.length;
+
+  const its = new Array(niters);
+  for (let i = 0; i < niters; ++i) {
+    its[i] = iters[i][Symbol.iterator]();
+  }
+
+  const vals = new Array(niters + 1);
   try {
-    while (({ value, done } = it0.next()), !done) {
-      yield proc(value);
+    for (const v0 of iter0) {
+      vals[0] = v0;
+      for (let i = 0; i < niters; ++i) {
+        const res = its[i].next();
+        if (res.done) {
+          return;
+        }
+        vals[i + 1] = res.value;
+      }
+      yield proc(...vals);
     }
   } finally {
-    _safeReturn(it0);
-  }
-}
-
-function _getIterators(iters) {
-  const length = iters.length;
-  const acc = new Array(length);
-  for (let i = 0; i < length; ++i) {
-    acc[i] = iters[i][Symbol.iterator]();
-  }
-  return acc;
-}
-
-function _nextIters(dst, it0, its) {
-  const length = its.length;
-  const { value: value0, done: done0 } = it0.next();
-
-  if (done0) {
-    return true;
-  }
-
-  dst[0] = value0;
-
-  for (let i = 0; i < length; ++i) {
-    const { value, done } = its[i].next();
-    if (done) {
-      return true;
+    for (let i = 0; i < niters; ++i) {
+      _safeReturn(its[i]);
     }
-    dst[i + 1] = value;
-  }
-
-  return false;
-}
-
-function _safeReturn(it) {
-  if (typeof it.return === "function") {
-    it.return();
   }
 }
 
-function* zip(iter0, ...iters) {
+export function* flatMap(proc, iter0, ...iters) {
+  if (iters.length === 0) {
+    yield* flatMap1(proc, iter0);
+  } else {
+    yield* _flatMapN(proc, iter0, iters);
+  }
+}
+
+export function* flatMap1(proc, iter0) {
+  for (const v0 of iter0) {
+    yield* proc(v0);
+  }
+}
+
+function* _flatMapN(proc, iter0, iters) {
+  const niters = iters.length;
+
+  const its = new Array(niters);
+  for (let i = 0; i < niters; ++i) {
+    its[i] = iters[i][Symbol.iterator]();
+  }
+
+  const vals = new Array(niters + 1);
+  try {
+    for (const v0 of iter0) {
+      vals[0] = v0;
+      for (let i = 0; i < niters; ++i) {
+        const res = its[i].next();
+        if (res.done) {
+          return;
+        }
+        vals[i + 1] = res.value;
+      }
+      yield* proc(...vals);
+    }
+  } finally {
+    for (let i = 0; i < niters; ++i) {
+      _safeReturn(its[i]);
+    }
+  }
+}
+
+export function* zip(iter0, ...iters) {
   const niters = iters.length;
 
   const its = new Array(niters);
@@ -98,5 +111,11 @@ function* zip(iter0, ...iters) {
     for (let i = 0; i < niters; ++i) {
       _safeReturn(its[i]);
     }
+  }
+}
+
+function _safeReturn(it) {
+  if (typeof it.return === "function") {
+    it.return();
   }
 }
