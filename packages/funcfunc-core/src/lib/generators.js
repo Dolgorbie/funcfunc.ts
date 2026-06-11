@@ -1,104 +1,167 @@
 
-export function* map(proc, iter0, ...iters) {
-  if (iters.length === 0) {
-    yield* map1(proc, iter0);
+export function map(proc, iterable0, ...iterables) {
+  if (iterables.length === 0) {
+    return map1(proc, iterable0);
   } else {
-    yield* _mapN(proc, iter0, iters);
+    return _mapN(proc, iterable0, iterables);
   }
 }
 
 
-export function* map1(proc, iter0) {
-  for (const v0 of iter0) {
+export function* map1(proc, iterable0) {
+  for (const v0 of iterable0) {
     yield proc(v0);
   }
 }
 
-function* _mapN(proc, iter0, iters) {
-  const niters = iters.length;
+function* _mapN(proc, iterable0, iterables) {
+  const niter = iterables.length;
 
-  const its = new Array(niters);
-  for (let i = 0; i < niters; ++i) {
-    its[i] = iters[i][Symbol.iterator]();
+  const iters = new Array(niter);
+  for (let i = 0; i < niter; ++i) {
+    iters[i] = iterables[i][Symbol.iterator]();
   }
 
-  const vals = new Array(niters + 1);
+  const values = new Array(niter + 1);
   try {
-    for (const v0 of iter0) {
-      vals[0] = v0;
-      for (let i = 0; i < niters; ++i) {
-        const res = its[i].next();
+    for (const v0 of iterable0) {
+      values[0] = v0;
+      for (let i = 0; i < niter; ++i) {
+        const res = iters[i].next();
         if (res.done) {
           return;
         }
-        vals[i + 1] = res.value;
+        values[i + 1] = res.value;
       }
-      yield proc(...vals);
+      yield proc(...values);
     }
   } finally {
-    for (let i = 0; i < niters; ++i) {
-      _safeReturn(its[i]);
+    for (let i = 0; i < niter; ++i) {
+      _safeReturn(iters[i]);
     }
   }
 }
 
-export function* flatMap(proc, iter0, ...iters) {
-  if (iters.length === 0) {
-    yield* flatMap1(proc, iter0);
+export function flatMap(proc, iterable0, ...iterables) {
+  if (iterables.length === 0) {
+    return flatMap1(proc, iterable0);
   } else {
-    yield* _flatMapN(proc, iter0, iters);
+    return _flatMapN(proc, iterable0, iterables);
   }
 }
 
-export function* flatMap1(proc, iter0) {
-  for (const v0 of iter0) {
+export function* flatMap1(proc, iterable0) {
+  for (const v0 of iterable0) {
     yield* proc(v0);
   }
 }
 
-function* _flatMapN(proc, iter0, iters) {
-  const niters = iters.length;
+function* _flatMapN(proc, iterable0, iterables) {
+  const niter = iterables.length;
 
-  const its = new Array(niters);
-  for (let i = 0; i < niters; ++i) {
-    its[i] = iters[i][Symbol.iterator]();
+  const iters = new Array(niter);
+  for (let i = 0; i < niter; ++i) {
+    iters[i] = iterables[i][Symbol.iterator]();
   }
 
-  const vals = new Array(niters + 1);
+  const values = new Array(niter + 1);
   try {
-    for (const v0 of iter0) {
-      vals[0] = v0;
-      for (let i = 0; i < niters; ++i) {
-        const res = its[i].next();
+    for (const v0 of iterable0) {
+      values[0] = v0;
+      for (let i = 0; i < niter; ++i) {
+        const res = iters[i].next();
         if (res.done) {
           return;
         }
-        vals[i + 1] = res.value;
+        values[i + 1] = res.value;
       }
-      yield* proc(...vals);
+      yield* proc(...values);
     }
   } finally {
-    for (let i = 0; i < niters; ++i) {
-      _safeReturn(its[i]);
+    for (let i = 0; i < niter; ++i) {
+      _safeReturn(iters[i]);
     }
   }
 }
 
-export function* zip(iter0, ...iters) {
-  const niters = iters.length;
+export function* concat(...iterables) {
+  const niter = iterables.length;
+  for (let i = 0; i < niter; ++i) {
+    yield* iterables[i];
+  }
+}
 
-  const its = new Array(niters);
-  for (let i = 0; i < niters; ++i) {
-    its[i] = iters[i][Symbol.iterator]();
+export function entries(...iterables) {
+  return zip(iota(), ...iterables);
+}
+
+export function every(pred, iterable0, ...iterables) {
+  if (iterables.length === 0) {
+    return every1(pred, iterable0);
+  }
+  return _everyN(pred, iterable0, iterables);
+}
+
+export function every1(pred, iterable0) {
+  let result = true;
+  for (const v0 of iterable0) {
+    result = pred(v0);
+    if (!result) {
+      break;
+    }
+  }
+  return result;
+}
+
+function _everyN(pred, iterable0, iterables) {
+  const niter = iterables.length;
+
+  const iters = new Array(niter);
+  for (let i = 0; i < niter; ++i) {
+    iters[i] = iterables[i][Symbol.iterator]();
+  }
+
+  const values = new Array(niter + 1);
+
+  try {
+    let result = true;
+    LoopIter0: for (const v0 of iterable0) {
+      values[0] = v0;
+      for (let i = 0; i < niter; ++i) {
+        const res = iters[i].next();
+        if (res.done) {
+          break LoopIter0;
+        }
+        values[i + 1] = res.value;
+      }
+      result = pred(...values);
+      if (!result) {
+        break;
+      }
+    }
+    return result;
+  } finally {
+    for (let i = 0; i < niter; ++i) {
+      _safeReturn(iters[i]);
+    }
+  }
+}
+
+export function* zip(iterable0, ...iterables) {
+  const niter = iterables.length;
+
+  const iters = new Array(niter);
+  for (let i = 0; i < niter; ++i) {
+    iters[i] = iterables[i][Symbol.iterator]();
   }
 
   try {
-    for (const v0 of iter0) {
-      const values = new Array(niters + 1);
+    for (const v0 of iterable0) {
+      const values = new Array(niter + 1);
       values[0] = v0;
 
-      for (let i = 0; i < niters; ++i) {
-        const res = its[i].next();
+      for (let i = 0; i < niter; ++i) {
+        const res = iters[i].next();
         if (res.done) {
           return;
         }
@@ -108,9 +171,63 @@ export function* zip(iter0, ...iters) {
       yield values;
     }
   } finally {
-    for (let i = 0; i < niters; ++i) {
-      _safeReturn(its[i]);
+    for (let i = 0; i < niter; ++i) {
+      _safeReturn(iters[i]);
     }
+  }
+}
+
+export function iota(count, start = 0, step = 1) {
+  if (count === void 0) {
+    return new _IotaInf(start, step);
+  }
+  return new _IotaFinite(count, start, step);
+}
+
+class _IotaBase {
+  [Symbol.iterator]() {
+    return this;
+  }
+
+  return(value) {
+    this.next = _IotaBase._returnDone;
+    return { value, done: true };
+  }
+
+  static _returnDone() {
+    return { value: void 0, done: true };
+  }
+}
+
+class _IotaInf extends _IotaBase {
+  constructor(start, step) {
+    super();
+    this._start = +start;
+    this._step = +step;
+    this._i = 0;
+  }
+
+  next() {
+    const value = (this._i++) * this._step + this._start;
+    return { value, done: false };
+  }
+}
+
+class _IotaFinite extends _IotaBase {
+  constructor(count, start, step) {
+    super();
+    this._count = (count | 0) & ~(count >> 31);
+    this._start = +start;
+    this._step = +step;
+    this._i = 0;
+  }
+
+  next() {
+    if (this._i >= this._count) {
+      return this.return();
+    }
+    const value = (this._i++) * this._step + this._start;
+    return { value, done: false };
   }
 }
 

@@ -87,10 +87,90 @@ export function setCdr(pair, value) {
   return pair._cdr = value;
 }
 
+export function lastPair(pair) {
+  let p = pair;
+  while (isPair(cdr(p))) {
+    p = cdr(p);
+  }
+  return p;
+}
+
 export function iter(list) {
   return new _ListIter(list);
 }
 
-export function iiter(improperList) {
+export function improperIter(improperList) {
   return new _IListIter(improperList);
+}
+
+export function at(list, index) {
+  let acc = list;
+  for (let i = 0; i < index; ++i) {
+    if (!isPair(acc)) {
+      return void 0;
+    }
+    acc = cdr(acc);
+  }
+  return isPair(acc) ? car(acc) : void 0;
+}
+
+export function concat(list0, ...lists) {
+  const nlists = lists.length;
+  if (nlists === 0) {
+    return list0;
+  }
+
+  let acc = lists[nlists - 1];
+  for (let i = nlists - 2; i >= 0; --i) {
+    acc = reverseI(reverse(lists[i]), acc);
+  }
+
+  return reverseI(reverse(list0), acc);
+}
+
+export function concatI(list0, ...lists) {
+  const nlists = lists.length;
+  if (nlists === 0) {
+    return list0;
+  }
+
+  let acc = list0;
+  let i;
+  for (i = 0; i < nlists; ++i) {
+    if (isPair(acc)) {
+      break;
+    }
+    acc = lists[i];
+  }
+
+  const result = acc;
+
+  for (; i < nlists; ++i) {
+    acc = lastPair(acc);
+    setCdr(acc, lists[i]);
+  }
+
+  return result;
+}
+
+export function reverse(list, last = null) {
+  let acc = last;
+  for (let tmp = list; isPair(tmp); tmp = cdr(tmp)) {
+    acc = cons(car(tmp), acc);
+  }
+  return acc;
+}
+
+export function reverseI(list, last = null) {
+  let acc = last;
+  let tmp = list;
+
+  while (isPair(tmp)) {
+    const next = cdr(tmp);
+    setCdr(tmp, acc);
+    acc = tmp;
+    tmp = next;
+  }
+
+  return acc;
 }
